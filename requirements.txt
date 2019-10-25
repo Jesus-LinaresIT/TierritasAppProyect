@@ -1,0 +1,11 @@
+flask
+flask-restplus
+flask-bcrypt
+Flask-Migrate
+Flask-Script
+flask-cors  
+psycopg2-binary
+PyJWT
+SQLAlchemy-ImageAttach
+SQLAlchemy>=1.1.9,<1.3.0
+Flask-SQLAlchemy==2.4.0
