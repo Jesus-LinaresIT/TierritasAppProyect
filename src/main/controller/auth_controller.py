@@ -1,4 +1,3 @@
-"""
 from flask import request
 from flask_restplus import Resource
 
@@ -18,7 +17,7 @@ class UserLogin(Resource):
     @api.expect(user_auth, validate=True)
     def post(self):
         # get the post data
-        post_data = request.json
+        post_data = request.get_json()
         return Auth.login_user(data=post_data)
 
 
@@ -32,5 +31,3 @@ class LogoutAPI(Resource):
         # get auth token
         auth_header = request.headers.get('Authorization')
         return Auth.logout_user(data=auth_header)
-
-"""

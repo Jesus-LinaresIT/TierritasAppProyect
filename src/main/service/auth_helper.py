@@ -1,6 +1,6 @@
-"""
 from main.model.user import Users
 from ..service.blacklist_service import save_token
+from ..util.decorators import *
 
 
 class Auth:
@@ -11,7 +11,7 @@ class Auth:
             # fetch the user data
             user = Users.query.filter_by(email=data.get('email')).first()
             if user and user.check_password(data.get('password')):
-                auth_token = user.encode_auth_token(user.id)
+                auth_token = user.encode_auth_token(user)
                 if auth_token:
                     response_object = {
                         'status': 'success',
@@ -37,20 +37,22 @@ class Auth:
     @staticmethod
     def logout_user(data):
         if data:
-            auth_token = data.split(" ")[1]
+            auth_token = data.split(" ")[0]
         else:
             auth_token = ''
+
         if auth_token:
             resp = Users.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
-                # mark the token as blacklisted
-                return save_token(token=auth_token)
-            else:
+
+            if resp:
                 response_object = {
                     'status': 'fail',
                     'message': resp
                 }
-                return response_object, 401
+                return response_object, 401               
+            else:
+                return save_token(token=auth_token)
+
         else:
             response_object = {
                 'status': 'fail',
@@ -71,8 +73,7 @@ def get_logged_in_user(new_request):
                     'data': {
                         'user_id': user.id,
                         'email': user.email,
-                        'isAdmin': user.isAdmin,
-                        'date': str(user.date)
+                        'isAdmin': user.isAdmin
                     }
                 }
                 return response_object, 200
@@ -87,4 +88,3 @@ def get_logged_in_user(new_request):
                 'message': 'Provide a valid auth token.'
             }
             return response_object, 401
-"""

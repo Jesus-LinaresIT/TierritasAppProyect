@@ -1,8 +1,8 @@
 from .. import db, flask_bcrypt
 import datetime as dt
 import jwt
-#from main.model.blacklist import BlacklistToken
-#from ..config import key
+from main.model.blacklist import BlacklistToken
+from ..config import SECRET_KEY
 
 class Users(db.Model):
 	#User Model for storing user related details
@@ -16,7 +16,7 @@ class Users(db.Model):
 	password_hash = db.Column(db.String(150))
 	birthday = db.Column(db.DateTime())
 	bloodtype = db.Column(db.VARCHAR(15))
-	dui = db.Column(db.VARCHAR(10))
+	dui = db.Column(db.VARCHAR(10), unique = True)
 	health_insurance_type = db.Column(db.String(25))
 	isAdmin = db.Column(db.Boolean)
 	isActive = db.Column(db.Boolean)
@@ -53,6 +53,43 @@ class Users(db.Model):
 		return "<Users '{}'>".format(self.first_name)
 
 
+
+	def encode_auth_token(self, user):
+		try:
+			payload = {
+				'exp': dt.datetime.utcnow() + dt.timedelta(hours=2),
+				'iat': dt.datetime.now().timestamp(),
+				'user_id': user.id, 
+				'email' : user.email,
+				'isAdmin' : user.isAdmin
+			}
+
+			return jwt.encode(
+					payload,
+					SECRET_KEY,
+					algorithm='HS256'
+			)
+
+		except Exception as e:
+			return e
+
+
+	def decode_auth_token(auth_token):
+		try:
+			payload = jwt.decode(auth_token, SECRET_KEY)
+			is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
+
+			if is_blacklisted_token:
+				return 'El usuario con email %s no tiene una sesión activa'% (payload['email'])
+			else:
+				return is_blacklisted_token
+		except jwt.ExpiredSignatureError:
+			return 'Signature expired. Please log in again.'
+
+		except jwt.InvalidTokenError:
+			return 'Invalid token. Please log in again.'
+
+
 class Contact(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -68,35 +105,4 @@ class Contact(db.Model):
 			if hasattr(self, k):
 				setattr(self, k, v)
 
-
-"""def encode_auth_token(self):
-	print('/////////////////////////////////', self.id)
-	try:
-		payload = {
-			'id': self.id,
-			'email': self.email
-		}
-		return jwt.encode(payload, key, algorithm = 'HS256')
-
-	except Exception as e:
-		return e
-
-
-def decode_auth_token(auth_token):
-     
-        Decodes the auth token
-        :param auth_token:
-        :return: integer|string
-       
-        try:
-            payload = jwt.decode(auth_token, key)
-            is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
-            if is_blacklisted_token:
-                return 'Token blacklisted. Please log in again.'
-            else:
-                return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
-        except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'   
-"""
+   

@@ -8,7 +8,6 @@ from main import create_app, db
 from main.model import user
 from main.model import blacklist
 
-
 app = create_app(os.getenv('BOILERPLATE_ENV') or 'dev')
 app.register_blueprint(bpt)
 
@@ -20,9 +19,11 @@ migrate = Migrate(app, db)
 
 manager.add_command('db', MigrateCommand)
 
+
 @manager.command
 def run():
-	app.run(host ='0.0.0.0', port = 9000)
+    app.run(host='0.0.0.0', port=9000)
+
 
 if __name__ == '__main__':
-	manager.run()
+    manager.run()

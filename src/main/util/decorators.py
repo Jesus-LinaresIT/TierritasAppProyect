@@ -1,8 +1,6 @@
-"""
 from functools import wraps
 from flask import request
-
-from main.service.auth_helper import Auth
+from main.service.auth_helper import *
 
 
 def token_required(f):
@@ -30,7 +28,7 @@ def admin_token_required(f):
         if not token:
             return data, status
 
-        admin = token.get('admin')
+        admin = token.get('isAdmin')
         if not admin:
             response_object = {
                 'status': 'fail',
@@ -41,5 +39,3 @@ def admin_token_required(f):
         return f(*args, **kwargs)
 
     return decorated
-
-"""

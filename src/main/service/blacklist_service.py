@@ -1,4 +1,3 @@
-"""
 from main import db
 from main.model.blacklist import BlacklistToken
 
@@ -20,4 +19,3 @@ def save_token(token):
             'message': e
         }
         return response_object, 200
-"""

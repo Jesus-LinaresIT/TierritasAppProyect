@@ -1,23 +1,25 @@
-import uuid
 import re
 import datetime as dt
 
 from main import db
 from main.model.user import Users, Contact
 
-def save_new_user(data):    
-    user = Users.query.filter_by(email=data['email']).first()
+def save_new_user(data, token_invite):
+    check_user = Users.query.filter_by(dui = data['dui']).first() or Users.query.filter_by(email = data['email']).first()
 
-    if not user:
-
+    if not check_user:
         user = Users(data)
         user.password = data['password']
+
         try:
             db.session.add(user)
             db.session.commit()
-        except:
-            return {'message' : 'Fail'}
-    return user       
+            return user
+
+        except Exception as e:
+            return {'message' : str(e)}
+    
+    return {'message' : 'Ya existe un usuario registrado con el dui o correo electrónico introducido'}
 
 
 def delete_one_user(id):
@@ -63,13 +65,11 @@ def get_a_user(id):
 
 
 
-   
-
-"""
 def generate_token(user):
     try:
-        # generate the auth token
+    # generate the auth token
         auth_token = user.encode_auth_token(user)
+
         response_object = {
             'status': 'success',
             'message': 'Successfully registered.',
@@ -85,4 +85,3 @@ def generate_token(user):
         }
 
         return response_object, 401
-"""
