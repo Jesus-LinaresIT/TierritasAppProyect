@@ -18,6 +18,7 @@ sqldiff.exe
 sqlite3.exe
 sqlite3_analyzer.exe
 .idea
+.vscode
 lib/
 lib64/
 parts/
@@ -91,11 +92,13 @@ celerybeat-schedule
 .env
 .venv
 env/
+env/*
 venv/
 ENV/
 env.bak/
 venv.bak/
-
+src/main_app/db/tierritas.db
+src/main_app/upload
 # Spyder project settings
 .spyderproject
 .spyproject

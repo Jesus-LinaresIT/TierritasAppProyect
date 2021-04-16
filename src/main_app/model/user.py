@@ -1,31 +1,32 @@
-from .. import db, flask_bcrypt
+from .. import DB as db, flask_bcrypt
 import datetime as dt
 import jwt
-from main.model.blacklist import BlacklistToken
+from ..model.blacklist import BlacklistToken
 from ..config import SECRET_KEY
 
+
 class Users(db.Model):
-	#User Model for storing user related details
+	# User Model for storing user related details
 	__tablename__ = "users"
 
 	id = db.Column(db.Integer, primary_key = True, autoincrement=True)
 	first_name = db.Column(db.String(150))
 	last_name = db.Column(db.String(150))
-	email = db.Column(db.VARCHAR(200), index = True, unique = True)
+	email = db.Column(db.VARCHAR(200), index=True, unique=True)
 	phone = db.Column(db.String(20))
 	password_hash = db.Column(db.String(150))
-	birthday = db.Column(db.DateTime())
+	birthdate = db.Column(db.DateTime())
 	bloodtype = db.Column(db.VARCHAR(15))
 	dui = db.Column(db.VARCHAR(10), unique = True)
-	health_insurance_type = db.Column(db.String(25))
+	health_insurance_type = db.Column(db.String(30))
 	isAdmin = db.Column(db.Boolean)
 	isActive = db.Column(db.Boolean)
 	date = db.Column(db.DateTime(timezone=True), default = dt.datetime.utcnow())	
 	insurance_company = db.Column(db.VARCHAR(75))
 	insurance_policy = db.Column(db.VARCHAR(75))
-	image = db.Column(db.VARCHAR(200))
+	image = db.Column(db.String(25))
 
-	relationContact = db.relationship('Contact', cascade = 'all,delete', backref = 'users', uselist = False)
+	relationContact = db.relationship('Contact', cascade = 'all,delete', backref = 'users', uselist = True)
 
 	def __init__(self, dictionary):
 		for k, v in dictionary.items():
@@ -53,7 +54,6 @@ class Users(db.Model):
 		return "<Users '{}'>".format(self.first_name)
 
 
-
 	def encode_auth_token(self, user):
 		try:
 			payload = {
@@ -73,16 +73,18 @@ class Users(db.Model):
 		except Exception as e:
 			return e
 
-
-	def decode_auth_token(auth_token):
+	@staticmethod
+	def decode_auth_token(auth_token):		
 		try:
 			payload = jwt.decode(auth_token, SECRET_KEY)
+			
 			is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
 
 			if is_blacklisted_token:
 				return 'El usuario con email %s no tiene una sesión activa'% (payload['email'])
 			else:
-				return is_blacklisted_token
+				return payload
+
 		except jwt.ExpiredSignatureError:
 			return 'Signature expired. Please log in again.'
 
@@ -91,18 +93,16 @@ class Users(db.Model):
 
 
 class Contact(db.Model):
-	id = db.Column(db.Integer, primary_key = True)
+	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	name = db.Column(db.String(150))
 	phone = db.Column(db.Integer)
 
 	def __init__(self, dictionary):
-	 	for k, v in dictionary.items():
-	 		setattr(self, k, v)
+		for k, v in dictionary.items():
+			setattr(self, k, v)
 
-	def updatePropertiesC(self, dictionary):
+	def updateProperties(self, dictionary):
 		for k, v in dictionary.items():
 			if hasattr(self, k):
 				setattr(self, k, v)
-
-   

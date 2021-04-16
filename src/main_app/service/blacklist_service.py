@@ -1,5 +1,5 @@
-from main import db
-from main.model.blacklist import BlacklistToken
+from .. import DB as db
+from ..model.blacklist import BlacklistToken
 
 
 def save_token(token):

@@ -6,8 +6,9 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-	SECRET_KEY = 'Thisisasecret!'
-	DEBUG = False	
+	SECRET_KEY = 'EFFE50097ED8F3804B847626CCFDA43EB68629B226797377AD1F958964BBDEF7'
+	DEBUG = False
+	
 
 class DevelomentConfig(Config):
 	# uncomment the line below to use postgres
@@ -28,3 +29,14 @@ config_by_name = dict(
 )
 
 SECRET_KEY = Config.SECRET_KEY
+FRONTEND_URL = 'https://www.tierritas.com.sv'
+EMAIL_FROM = "tierritasmotoclub@gmail.com"
+EMAIL_PASSWORD = ('CrmzG#01')
+
+
+ALLOWED_EXTENSIONS = {'text', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'upload/')
+
+
+

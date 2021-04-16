@@ -1,4 +1,4 @@
-from .. import db
+from .. import DB as db
 import datetime as dt
 
 
